@@ -84,7 +84,6 @@ func handleConnection(conn net.Conn) {
 			}
 			// 输出接收到的消息
 			fmt.Printf("Received message: %s\n", string(message))
-
 			// 回复客户端
 			conn.Write([]byte("Message received."))
 		}
