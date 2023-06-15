@@ -4,11 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"time"
 )
-
-const timeOut = 300 * time.Second
-const messageTimeOut = 200 * time.Second
 
 func Server() {
 	// 创建一个监听器，在指定的地址和端口上监听TCP连接请求
