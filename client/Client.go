@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"free/client/consts"
 	"net"
 	"os"
 	"time"
@@ -15,7 +16,11 @@ func main() {
 		fmt.Println("Error connecting:", err.Error())
 		os.Exit(1)
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			fmt.Printf("Error closing connection:%v", err.Error())
+		}
+	}()
 
 	// 启动一个 goroutine 用于读取服务器响应并输出
 	messages := make(chan string)
@@ -39,7 +44,10 @@ func main() {
 	for {
 		fmt.Print("Enter message: ")
 		text, _ := reader.ReadString('\n')
-		fmt.Fprintf(conn, text)
+		n, err := fmt.Fprintf(conn, text)
+		if err != nil {
+			fmt.Printf("控制台写出conn%d字节：%v", n, err.Error())
+		}
 		select {
 		case message, ok := <-messages:
 			if !ok {
@@ -47,7 +55,7 @@ func main() {
 				return
 			}
 			fmt.Println("Response from server:", message)
-		case <-time.After(30 * time.Second): // 等待1秒钟，如果没有服务器响应则继续下一次用户输入
+		case <-time.After(consts.ReactTimeOut): // 等待1分钟，如果没有服务器响应则继续下一次用户输入
 			fmt.Println("No response from server.")
 		}
 	}
